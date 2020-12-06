@@ -24,6 +24,7 @@ object _Config {
 }
 
 enum class Level {
+    STACKTRACE,
     ERROR,
     WARN,
     INFO,

@@ -1,5 +1,7 @@
 package io.github.serpro69.todo.or.die
 
+import io.github.serpro69.todo.or.die._Config.messageLevel
+import io.github.serpro69.todo.or.die._Config.printCantDie
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -33,24 +35,33 @@ fun TODO(by: String, task: () -> String) {
     val dueBy = LocalDate.parse(by)
 
     if (today > dueBy) {
-        with(_Config) {
-            when(printCantDie) {
-                false -> throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task.invoke()}\n")
-                true -> print(
-                    msg ="Overdue todo task that was due on '$by':\n${task.invoke()}\n",
-                    level = messageLevel
-                )
+        when (printCantDie) {
+            false -> failedTodo(by, task)
+            true -> when (messageLevel) {
+                Level.STACKTRACE -> {
+                    try {
+                        failedTodo(by, task)
+                    } catch (e: OverdueError) {
+                        e.printStackTrace()
+                    }
+                }
+                else -> {
+                    print(msg = "Overdue todo task that was due on '$by':\n${task.invoke()}\n", level = messageLevel)
+                }
             }
         }
     }
 }
 
+private fun failedTodo(by: String, task: () -> String): Nothing =
+    throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task.invoke()}\n")
+
 private fun print(msg: String, level: Level) {
-    when(level) {
-        Level.ERROR -> Logger.error(msg)
-        Level.WARN -> Logger.warn(msg)
-        Level.INFO -> Logger.info(msg)
+    when (level) {
         Level.DEBUG -> Logger.debug(msg)
+        Level.INFO -> Logger.info(msg)
+        Level.WARN -> Logger.warn(msg)
+        else -> Logger.error(msg)
     }
 }
 

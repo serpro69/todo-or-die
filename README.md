@@ -117,13 +117,12 @@ With this, instead of getting those nice `OverdueError`s you will have environme
 Just like <i>"Let's eat grandma"</i> can mean two things, same applies to `printCantDie` property.
 As they used to say in the good old days: <i>"Punctuation saves lives!"</i>
 
-The `messageLevel` simply changes the color of the output for the printed message, where:
-```kotlin
-ERROR == RED
-WARN == YELLOW
-INFO == BLUE
-DEBUG == WHITE
-```
+The `messageLevel` simply changes the color of the output for the printed message, where available levels are:
+* `STACKTRACE` - catches the `OverdueError` and prints the stacktrace from the exception object
+* `ERROR` - prints the message in RED and prefixes with `"[ERROR]"`
+* `WARN` - prints the message in YELLOW and prefixes with `"[WARN]"`
+* `INFO` - prints the message in BLUE and prefixes with `"[INFO]"`
+* `DEBUG` - prints the message in WHITE and prefixes with `"[DEBUG]"`
 
 
 ## Contributing

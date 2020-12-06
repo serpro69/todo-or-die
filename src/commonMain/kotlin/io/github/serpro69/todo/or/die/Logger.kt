@@ -18,26 +18,26 @@ internal object Logger {
      *
      * The message is not colorized at this level.
      */
-    fun debug(msg: String) = print(msg, Color.WHITE)
+    fun debug(msg: String) = print("[DEBUG] $msg", Color.WHITE)
 
     /**
      * Prints INFO [msg] to stdout.
      *
      * The message is colored in [Color.BLUE] ANSI color.
      */
-    fun info(msg: String) = print(msg, Color.BLUE)
+    fun info(msg: String) = print("[INFO] $msg", Color.BLUE)
 
     /**
      * Prints INFO [msg] to stdout.
      *
      * The message is colored in [Color.YELLOW] ANSI color.
      */
-    fun warn(msg: String) = print(msg, Color.YELLOW)
+    fun warn(msg: String) = print("[WARN] $msg", Color.YELLOW)
 
     /**
      * Prints INFO [msg] to stdout.
      *
      * The message is colored in [Color.RED] ANSI color.
      */
-    fun error(msg: String) = print(msg, Color.RED)
+    fun error(msg: String) = print("[ERROR] $msg", Color.RED)
 }
