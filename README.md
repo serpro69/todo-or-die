@@ -104,6 +104,21 @@ where you intentionally write crappy code initially just to make it work, and th
 Nevertheless, I strongly recommend you to read what the default behavior of this lib does before it leads to you loosing your job.
 (Speaking of, please also take note of the lack of any guarantees and warranties in the [licence](LICENCE.md))
 
+### Some failsafe configuration
+
+You can configure your `TODO`s to not blow-up your code, but instead emit safe warnings like so:
+```kotlin
+TodoOrDieConfig {
+    printCantDie = true
+    messageLevel = Level.ERROR
+}
+```
+
+With this, instead of getting those nice `OverdueError`s you will have environmentally-friendly print-outs in your `System.out`.
+
+Just like `Let's eat grandma` can mean two things, same applies to `printCantDie` property.
+As they used to say in the good old days: <i>"Punctuation saves lives!"</i>
+
 ## Contributing
 
 Feel free to submit a [pull request](https://github.com/serpro69/kotlin-faker/compare) 

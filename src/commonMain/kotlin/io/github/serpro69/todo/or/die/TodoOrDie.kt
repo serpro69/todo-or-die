@@ -32,13 +32,27 @@ fun TODO(by: String, task: () -> String) {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val dueBy = LocalDate.parse(by)
 
-    if (today > dueBy) throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task.invoke()}\n")
+    if (today > dueBy) {
+        with(_Config) {
+            when(printCantDie) {
+                false -> throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task.invoke()}\n")
+                true -> print(
+                    msg ="Overdue todo task that was due on '$by':\n${task.invoke()}\n",
+                    level = messageLevel
+                )
+            }
+        }
+    }
 }
 
-/* TODO
-    Add TodoOrDieConfig class.
-        Different levels of failures (emit a warning, throw error (default))
- */
+private fun print(msg: String, level: Level) {
+    when(level) {
+        Level.ERROR -> Logger.error(msg)
+        Level.WARN -> Logger.warn(msg)
+        Level.INFO -> Logger.info(msg)
+        Level.DEBUG -> Logger.debug(msg)
+    }
+}
 
 /* TODO
     Add another function: TODO(task: String, condition: () -> Boolean) - fails based on the `condition`
