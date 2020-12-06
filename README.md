@@ -1,8 +1,8 @@
 ### todo-or-die
 
+<img src="icon/todo-or-die.png" height="186" alt="todo-or-die"></img>
+
 > "todo or not todo?", that is the ultimate question of life
->
-> <img src="icon/todo-or-die.png" height="186" alt="todo-or-die"></img>
 
 [![Download](https://api.bintray.com/packages/serpro69/maven/todo-or-die/images/download.svg)](https://bintray.com/serpro69/maven/todo-or-die/_latestVersion)
 [![Issues Badge](https://img.shields.io/github/issues/serpro69/todo-or-die.svg)](https://github.com/serpro69/todo-or-die/issues)
@@ -37,23 +37,18 @@ which has been proven time and again by numerous software developers and teams.
 ## Installation
 
 ### Gradle
-#### Repositories
-The project depends on [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime),
-which is currently available only in the following repository:
+
+Add the following repository to your build file:
 ```kotlin
 repositories {
-    maven(url = "https://kotlin.bintray.com/kotlinx/")
+    maven(url = "https://dl.bintray.com/serpro69/maven")
 }
 ```
 
-[Latest releases](https://bintray.com/serpro69/maven/todo-or-die/_latestVersion) of this lib are always available in jcenter repo:
-```kotlin
-repositories{
-    jcenter()
-}
-```
 
-#### Dependency
+*Note that the project depends on [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime)
+which is currently available only in the following repository: `https://kotlin.bintray.com/kotlinx/`*
+
 After the above repos are included in your build file, add one of the following to your dependencies:
 ```kotlin
 //JVM
@@ -65,6 +60,9 @@ implementation("io.github.serpro69:todo-or-die-js:$version")
 //MultiPlatform/commonMain
 implementation("io.github.serpro69:todo-or-die:$version")
 ```
+
+Latest releases of this lib are always available in this
+[bintray repo](https://bintray.com/serpro69/maven/todo-or-die/_latestVersion).
 
 ## Usage
 
@@ -116,8 +114,17 @@ TodoOrDieConfig {
 
 With this, instead of getting those nice `OverdueError`s you will have environmentally-friendly print-outs in your `System.out`.
 
-Just like `Let's eat grandma` can mean two things, same applies to `printCantDie` property.
+Just like <i>"Let's eat grandma"</i> can mean two things, same applies to `printCantDie` property.
 As they used to say in the good old days: <i>"Punctuation saves lives!"</i>
+
+The `messageLevel` simply changes the color of the output for the printed message, where:
+```kotlin
+ERROR == RED
+WARN == YELLOW
+INFO == BLUE
+DEBUG == WHITE
+```
+
 
 ## Contributing
 
