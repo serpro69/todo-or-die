@@ -1,9 +1,9 @@
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.net.URI
 
 plugins {
     kotlin("multiplatform") version "1.4.20"
     `maven-publish`
-    id("com.jfrog.bintray") version "1.8.5"
 }
 
 group = findProperty("group").toString()
@@ -96,51 +96,71 @@ kotlin {
         val nativeTest by getting
     }
 
-//  https://github.com/gradle/gradle/issues/11412#issuecomment-555413327
-    System.setProperty("org.gradle.internal.publish.checksums.insecure", "true")
+    plugins.withId("maven-publish") {
+//        https://github.com/gradle/gradle/issues/11412#issuecomment-555413327
+        System.setProperty("org.gradle.internal.publish.checksums.insecure", "true")
 
-    publishing {
-        repositories {
-            maven {
-                val bintrayUser = findProperty("bintrayUser") as String?
-                val bintrayKey = findProperty("bintrayKey") as String?
+        configure<PublishingExtension> {
+            val vcs: String by project
+            val bintrayOrg: String by project
+            val bintrayRepository: String by project
+            val bintrayPackage: String by project
 
-                setUrl("https://api.bintray.com/maven/serpro69/maven/todo-or-die/;publish=1;override=1")
-
-                credentials {
-                    username = bintrayUser
-                    password = bintrayKey
+            repositories {
+                maven {
+                    name = "bintray"
+                    url = URI("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=0;override=0")
+                    credentials {
+                        username = findProperty("bintrayUser") as String?
+                        password = findProperty("bintrayKey") as String?
+                    }
                 }
             }
-        }
 
-        publications {
-            filterIsInstance<MavenPublication>().forEach { publication ->
-                publication.pom {
+            publications.withType<MavenPublication> {
+                pom {
                     name.set(project.name)
                     description.set(project.description)
-                    packaging = "jar"
-                    url.set("https://github.com/serpro69/${project.name}")
-                    developers {
-                        developer {
-                            id.set("serpro69")
-                            name.set("Sergii Prodan")
-                            email.set("serpro@disroot.org")
-                        }
-                    }
+                    url.set(vcs)
                     licenses {
                         license {
                             name.set("MIT")
-                            url.set("https://github.com/serpro69/${project.name}/blob/master/LICENCE.md")
+                            url.set("$vcs/blob/master/LICENCE.md")
+                            distribution.set("repo")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set(bintrayOrg)
+                            name.set("Sergii Prodan")
                         }
                     }
                     scm {
-                        connection.set("scm:git:https://github.com/serpro69/${project.name}.git")
-                        developerConnection.set("scm:git:git@github.com:serpro69/${project.name}.git")
-                        url.set("https://github.com/serpro69/${project.name}")
+                        connection.set("$vcs.git")
+                        developerConnection.set("$vcs.git")
+                        url.set(vcs)
                     }
                 }
             }
         }
+
+        val taskPrefixes = when {
+            HostManager.hostIsLinux -> listOf(
+                "publishLinux",
+                "publishJs",
+                "publishJvm",
+                "publishMetadata",
+                "publishKotlinMultiplatform"
+            )
+            HostManager.hostIsMac -> listOf("publishMacos", "publishIos")
+            HostManager.hostIsMingw -> listOf("publishMingw")
+            else -> error("Unknown host, abort publishing.")
+        }
+
+        val publishTasks = tasks.withType<PublishToMavenRepository>().matching { task ->
+            taskPrefixes.any { task.name.startsWith(it) }
+        }
+
+        tasks.register("publishAll") { dependsOn(publishTasks) }
     }
 }
