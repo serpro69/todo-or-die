@@ -8,7 +8,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 /**
- * Promotes a healthy procrastination of doing something [by] a specified date
+ * Promotes a healthy coding procrastination [by] a specified date
  * by throwing an exception if the due date has passed and the [task] hasn't been resolved.
  *
  * Examples:
@@ -36,11 +36,11 @@ fun TODO(by: String, task: () -> String) {
 
     if (today > dueBy) {
         when (printCantDie) {
-            false -> failedTodo(by, task)
+            false -> failedToDo(by, task.invoke())
             true -> when (messageLevel) {
                 Level.STACKTRACE -> {
                     try {
-                        failedTodo(by, task)
+                        failedToDo(by, task.invoke())
                     } catch (e: OverdueError) {
                         e.printStackTrace()
                     }
@@ -53,8 +53,52 @@ fun TODO(by: String, task: () -> String) {
     }
 }
 
-private fun failedTodo(by: String, task: () -> String): Nothing =
-    throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task.invoke()}\n")
+/**
+ * Promotes a healthy coding procrastination by throwing an exception if the [predicate] returns `true`
+ * and the [task] hasn't been resolved.
+ *
+ * Examples:
+ * ```
+ * // This will always fail
+ * TODO("Find The Answer to the Ultimate Question of Life, The Universe, and Everything") { true }
+ *
+ * // This will never fail
+ * TODO("Reverse the workings of the second law of thermodynamics") { false }
+ *
+ * @param task description of what needs to be done
+ * @param predicate condition for the task.
+ *
+ * @throws OverdueError when [predicate] returns `true`
+ */
+@Suppress("FunctionName")
+@Throws(OverdueError::class)
+fun TODO(task: () -> String, predicate: () -> Boolean) {
+    if (predicate.invoke()) {
+        when (printCantDie) {
+            false -> failedToDo(task.invoke())
+            true -> when (messageLevel) {
+                Level.STACKTRACE -> {
+                    try {
+                        failedToDo(task.invoke())
+                    } catch (e: OverdueError) {
+                        e.printStackTrace()
+                    }
+                }
+                else -> {
+                    print(msg = "Failed to complete the task with a predicate:\n=> $task", level = messageLevel)
+                }
+            }
+        }
+    }
+}
+
+private fun failedToDo(task: String): Nothing {
+    throw OverdueError("Failed to complete the task with a predicate:\n=> ${task}\n")
+}
+
+private fun failedToDo(by: String, task: String): Nothing {
+    throw OverdueError("Overdue todo task that was due on '$by':\n=> ${task}\n")
+}
 
 private fun print(msg: String, level: Level) {
     when (level) {
@@ -64,7 +108,3 @@ private fun print(msg: String, level: Level) {
         else -> Logger.error(msg)
     }
 }
-
-/* TODO
-    Add another function: TODO(task: String, condition: () -> Boolean) - fails based on the `condition`
- */

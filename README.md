@@ -68,6 +68,10 @@ Latest releases of this lib are always available in this
 
 It's quite simple really. Let's say you want to remind yourself to add some extra tests to your `ControllerTest` class.
 
+#### By Date
+
+The most common usage is to set a date for your `TODO`s:
+
 ```kotlin
 class ControllerTest {
 
@@ -87,6 +91,18 @@ class ControllerTest {
 The above piece of code will start throwing `OverdueError` from "2020-12-25" onward, 
 which is probably a good example only if you want to get some angry calls from your management on the Christmas Day,
 but should still give you an overall idea on how to use the functionality.
+
+#### Conditional ToDo
+
+Another option is to provide a condition that returns `true` or `false`. 
+An example could look something like this:
+```kotlin
+TODO("Upgrade to kotlin 1.5.0") {
+    kotlin150IsReleased()
+}
+```
+
+This will throw an `OverdueError` as soon as `kotlin150IsReleased()` function returns `true`.
 
 ### *"Won't this explode in my face at the most unexpected moment?"*
 
