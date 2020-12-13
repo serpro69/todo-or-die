@@ -143,8 +143,8 @@ The `messageLevel` simply changes the color of the output for the printed messag
 
 ## Contributing
 
-Feel free to submit a [pull request](https://github.com/serpro69/kotlin-faker/compare) 
-and/or open a [new issue](https://github.com/serpro69/kotlin-faker/issues/new)
+Feel free to submit a [pull request](https://github.com/serpro69/todo-or-die/compare) 
+and/or open a [new issue](https://github.com/serpro69/todo-or-die/issues/new)
 if you would like to contribute.
 
 ## Licence
