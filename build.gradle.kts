@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.net.URI
 
@@ -57,12 +58,11 @@ kotlin {
             }
         }
     }
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
+
     val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        isMingwX64 -> mingwX64("native")
+        HostManager.hostIsMac -> macosX64("macos")
+        HostManager.hostIsLinux -> linuxX64("linux")
+        HostManager.hostIsMingw -> mingwX64("mingw")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
@@ -92,8 +92,18 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
-        val nativeMain by getting
-        val nativeTest by getting
+
+        targets.withType<KotlinNativeTarget> {
+            named("${name}Main") {
+                kotlin.srcDir("src/nativeMain/kotlin")
+                resources.srcDir("src/nativeMain/resources")
+            }
+
+            named("${name}Test") {
+                kotlin.srcDir("src/nativeTest/kotlin")
+                resources.srcDir("src/nativeTest/resources")
+            }
+        }
     }
 
     plugins.withId("maven-publish") {
