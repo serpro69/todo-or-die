@@ -105,72 +105,82 @@ kotlin {
             }
         }
     }
+}
 
-    plugins.withId("maven-publish") {
+publishing {
 //        https://github.com/gradle/gradle/issues/11412#issuecomment-555413327
-        System.setProperty("org.gradle.internal.publish.checksums.insecure", "true")
+    System.setProperty("org.gradle.internal.publish.checksums.insecure", "true")
 
-        configure<PublishingExtension> {
-            val vcs: String by project
-            val bintrayOrg: String by project
-            val bintrayRepository: String by project
-            val bintrayPackage: String by project
+    val vcs: String by project
+    val bintrayOrg: String by project
+    val bintrayRepository: String by project
+    val bintrayPackage: String by project
 
-            repositories {
-                maven {
-                    name = "bintray"
-                    url = URI("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=0;override=0")
-                    credentials {
-                        username = findProperty("bintrayUser") as String?
-                        password = findProperty("bintrayKey") as String?
-                    }
-                }
+    repositories {
+        maven {
+            name = "bintray"
+            url =
+                URI("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=0;override=0")
+            credentials {
+                username = findProperty("bintrayUser") as String?
+                password = findProperty("bintrayKey") as String?
             }
+        }
+    }
 
-            publications.withType<MavenPublication> {
-                pom {
-                    name.set(project.name)
-                    description.set(project.description)
-                    url.set(vcs)
-                    licenses {
-                        license {
-                            name.set("MIT")
-                            url.set("$vcs/blob/master/LICENCE.md")
-                            distribution.set("repo")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set(bintrayOrg)
-                            name.set("Sergii Prodan")
-                        }
-                    }
-                    scm {
-                        connection.set("$vcs.git")
-                        developerConnection.set("$vcs.git")
-                        url.set(vcs)
-                    }
+    publications {
+        val kotlinMultiplatform by getting
+
+        kotlinMultiplatform.closureOf<Publication> {
+            artifacts {
+                add(kotlinMultiplatform.name, "sources") {
+                    builtBy("metadataSourcesJar")
                 }
             }
         }
-
-        val taskPrefixes = when {
-            HostManager.hostIsLinux -> listOf(
-                "publishLinux",
-                "publishJs",
-                "publishJvm",
-                "publishMetadata",
-                "publishKotlinMultiplatform"
-            )
-            HostManager.hostIsMac -> listOf("publishMacos", "publishIos")
-            HostManager.hostIsMingw -> listOf("publishMingw")
-            else -> error("Unknown host, abort publishing.")
+    }
+    publications.withType<MavenPublication> {
+        pom {
+            name.set(project.name)
+            description.set(project.description)
+            url.set(vcs)
+            licenses {
+                license {
+                    name.set("MIT")
+                    url.set("$vcs/blob/master/LICENCE.md")
+                    distribution.set("repo")
+                }
+            }
+            developers {
+                developer {
+                    id.set(bintrayOrg)
+                    name.set("Sergii Prodan")
+                }
+            }
+            scm {
+                connection.set("$vcs.git")
+                developerConnection.set("$vcs.git")
+                url.set(vcs)
+            }
         }
-
-        val publishTasks = tasks.withType<PublishToMavenRepository>().matching { task ->
-            taskPrefixes.any { task.name.startsWith(it) }
-        }
-
-        tasks.register("publishAll") { dependsOn(publishTasks) }
     }
 }
+
+val taskPrefixes = when {
+    HostManager.hostIsLinux -> listOf(
+        "publishLinux",
+        "publishJs",
+        "publishJvm",
+        "publishMetadata",
+        "publishKotlinMultiplatform"
+    )
+    HostManager.hostIsMac -> listOf("publishMacos", "publishIos")
+    HostManager.hostIsMingw -> listOf("publishMingw")
+    else -> error("Unknown host, abort publishing.")
+}
+
+val publishTasks = tasks.withType<PublishToMavenRepository>().matching { task ->
+    taskPrefixes.any { task.name.startsWith(it) }
+}
+
+tasks.register("publishAll") { dependsOn(publishTasks) }

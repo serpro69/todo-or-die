@@ -6,3 +6,5 @@ pluginManagement {
         jcenter()
     }
 }
+
+enableFeaturePreview("GRADLE_METADATA")

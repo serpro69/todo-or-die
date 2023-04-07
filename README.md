@@ -1,3 +1,5 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
+
 ### todo-or-die
 
 <img src="icon/todo-or-die.png" height="186" alt="todo-or-die"></img>
